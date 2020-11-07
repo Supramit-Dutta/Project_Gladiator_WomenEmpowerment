@@ -1,6 +1,7 @@
 package com.lti.repository;
 
 import java.util.List;
+import java.time.LocalDate;
 import java.time.Period;
 
 import javax.persistence.EntityManager;
@@ -49,7 +50,7 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	}
 
 	public List<Course> viewAllCourses() {
-		Query query = em.createQuery("select cour from Course cour" , Course.class) ;
+		Query query = em.createQuery("select cour from Course cour LEFT JOIN FETCH cour.ngo" , Course.class) ;
 		return query.getResultList() ;
 	}
 
@@ -58,7 +59,10 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 		if(course == null){
 			System.out.println("Course not Found. Enter courseId from the List/Table");
 		}
-		else{ 
+		else{
+			enroll.setUserEnrollmentStatus("Not Approved");
+			enroll.setCourse(course);
+			enroll.setEnrollmentDate(LocalDate.now());
 			em.merge(enroll) ;  //use enrollemntDate as localdate.now() while testing  
 			System.out.println("User enrolled."); //while testing input Enrollment status as Approval Pending 	
 		}
@@ -198,24 +202,24 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	}
 
 	@Transactional
-	public void addACourse(Course course) {
-		em.merge(course) ;
-		System.out.println("Course added.");
+	public int addACourse(Course course) {
+		Course c=em.merge(course) ;
+		return c.getCourseId();
 	}
 
 	@Transactional
-	public void editACourse(Course course) {
-		em.merge(course) ;
-		System.out.println("Course updated.");
+	public int editACourse(Course course) {
+		Course c=em.merge(course) ;
+		return c.getCourseId();
 	}
 
 	@Transactional
-	public void deleteACourse(int courseId) {
+	public int deleteACourse(int courseId) {
 		String jpql="delete from Course c where c.courseId=:cid";
 		Query query=em.createQuery(jpql);
 		query.setParameter("cid",courseId);
 		int x=query.executeUpdate();
-		System.out.println(x+" course deleted!");
+		return x;
 	}
 
 
@@ -231,7 +235,7 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	}
 
 	public List<User> viewAllUsers() {
-		Query query = em.createQuery("select u from User u" , User.class) ;
+		Query query = em.createQuery("select u from User u LEFT JOIN FETCH u.ngo" , User.class) ;
 		return query.getResultList() ;
 	}
 
@@ -277,10 +281,11 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	}
 
 	public NGO logInNGO(String ngoEmail, String ngoPassword) {
-		String jpql="select n from NGO n where n.ngoEmail=:nel and n.ngoPassword=:pwd";
+		String jpql="select n from NGO n where n.ngoEmail=:nel and n.ngoPassword=:pwd and n.ngoApplicationStatus=:stat ";
 		TypedQuery<NGO> query=em.createQuery(jpql, NGO.class);
 		query.setParameter("nel", ngoEmail);
 		query.setParameter("pwd", ngoPassword);
+		query.setParameter("stat","Approved");
 		return query.getSingleResult();
 	}
 	
@@ -299,14 +304,14 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	}
 
 	public List<Course> viewCourseByNGO(int ngoId) {
-		String jpql="select c from Course c where c.ngoId=:nid";
+		String jpql="select c from Course c where c.ngo.ngoId=:nid";
 		TypedQuery<Course> query=em.createQuery(jpql, Course.class);
 		query.setParameter("nid", ngoId);
 		return query.getResultList();
 	}
 
 	public List<NGO> viewAllNGO() {
-		Query query = em.createQuery("select n from NGO n" , NGO.class) ;
+		Query query = em.createQuery("select n from NGO n LEFT JOIN FETCH n.courses" , NGO.class) ;
 		return query.getResultList();
 	}
 	
@@ -361,5 +366,20 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
                 .createQuery("select count(n.ngoId) from NGO n where n.ngoEmail=:nel")
                 .setParameter("nel", email)
                 .getSingleResult() == 1 ? true : false;
+	}
+	
+	public boolean isCoursePresent(String courseName) {
+		return (Long)
+                em
+                .createQuery("select count(c.courseId) from Course c where c.courseName=:cname")
+                .setParameter("cname", courseName)
+                .getSingleResult() == 1 ? true : false;
+	}
+	
+	public NGO findNGOByEmail(String email) {
+		String jpql="select n from NGO n where n.ngoEmail=:nel";
+		TypedQuery<NGO> query=em.createQuery(jpql, NGO.class);
+		query.setParameter("nel", email);
+		return query.getSingleResult();
 	}
 }

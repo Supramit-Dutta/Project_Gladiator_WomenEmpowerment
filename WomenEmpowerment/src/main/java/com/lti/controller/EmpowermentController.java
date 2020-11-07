@@ -1,17 +1,24 @@
 package com.lti.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lti.dto.CourseOperationDto;
 import com.lti.dto.ForgotStatusDto;
 import com.lti.dto.LoginDto;
 import com.lti.dto.LoginStatusDto;
+import com.lti.dto.NGOStatusDto;
+import com.lti.dto.NgoOperationStatusDto;
 import com.lti.dto.StatusDto;
 import com.lti.dto.StatusDto.StatusType;
+import com.lti.entity.Course;
 import com.lti.entity.NGO;
 import com.lti.entity.User;
 import com.lti.exception.WomenEmpowermentException;
@@ -203,7 +210,7 @@ public class EmpowermentController {
 	            
 	            StatusDto status = new StatusDto();
 	            status.setStatus(StatusType.SUCCESS);
-	            status.setMessage("Registration successful!");
+	            status.setMessage("Registration application successful!");
 	            return status;
         }
 	    catch(WomenEmpowermentException e) {
@@ -266,6 +273,152 @@ public class EmpowermentController {
 			loginStatus.setStatus(StatusType.FAILURE);
 			loginStatus.setMessage("Login failed!");
 			return loginStatus;
+		}
+	}
+	@PostMapping("/approveNGO")
+	public NGOStatusDto approvalNGO(@RequestBody NGOStatusDto ngodto) {
+		NGO ngo=services.findanNGOByEmail(ngodto.getNgoemail());
+		 try {
+	            services.approveNgo(ngo);
+	            
+	            NGOStatusDto status = new NGOStatusDto();
+	            status.setStatus(StatusType.SUCCESS);
+	            status.setMessage("Registration approval successful!");
+	            status.setNgoemail(ngodto.getNgoemail());
+	            status.setNgoName(ngodto.getNgoName());
+	            return status;
+		 }
+	    catch(WomenEmpowermentException e) {
+	            NGOStatusDto status = new NGOStatusDto();
+	            status.setStatus(StatusType.FAILURE);
+	            status.setMessage(e.getMessage());
+	            return status;
+	    }
+	}
+	@RequestMapping("/addCourse")
+	public NgoOperationStatusDto addCourse(@RequestBody CourseOperationDto coursedto){
+		Course c=new Course();
+		NGO ngo=services.findanNGOByEmail(coursedto.getNgoEmail());
+		c.setCourseName(coursedto.getCourseName());
+		c.setCourseBenefits(coursedto.getCourseBenefits());
+		c.setCourseEndDate(coursedto.getCourseEndDate());
+		c.setCourseStartDate(coursedto.getCourseStartDate());
+		c.setTrainingSector(coursedto.getTrainingSector());
+		c.setCourseProvidingNGO(ngo.getNgoName());
+		c.setNgo(ngo);
+		try {
+			services.addCourse(c, ngo);
+			NgoOperationStatusDto status=new NgoOperationStatusDto();
+			status.setMessage("Course addition successful!");
+			status.setStatus(StatusType.SUCCESS);
+			status.setNgoName(ngo.getNgoName());
+			return status;
+		}
+		catch(WomenEmpowermentException e) {
+			NgoOperationStatusDto status=new NgoOperationStatusDto();
+			status.setMessage("Course addition unsuccessful!");
+			status.setStatus(StatusType.FAILURE);
+			status.setNgoName(ngo.getNgoName());
+            return status;
+		}
+	}
+	@RequestMapping("/editCourse")
+	public NgoOperationStatusDto editCourse(@RequestBody CourseOperationDto coursedto){
+		Course c=new Course();
+		NGO ngo=services.findanNGOByEmail(coursedto.getNgoEmail());
+		c.setCourseName(coursedto.getCourseName());
+		c.setCourseBenefits(coursedto.getCourseBenefits());
+		c.setCourseEndDate(coursedto.getCourseEndDate());
+		c.setCourseStartDate(coursedto.getCourseStartDate());
+		c.setTrainingSector(coursedto.getTrainingSector());
+		c.setCourseProvidingNGO(ngo.getNgoName());
+		c.setNgo(ngo);
+		try {
+			services.editCourse(c, ngo);
+			NgoOperationStatusDto status=new NgoOperationStatusDto();
+			status.setMessage("Course updation successful!");
+			status.setStatus(StatusType.SUCCESS);
+			status.setNgoName(ngo.getNgoName());
+			return status;
+		}
+		catch(WomenEmpowermentException e) {
+			NgoOperationStatusDto status=new NgoOperationStatusDto();
+			status.setMessage("Course updation unsuccessful!");
+			status.setStatus(StatusType.FAILURE);
+			status.setNgoName(ngo.getNgoName());
+            return status;
+		}
+	}
+	@RequestMapping("/deleteCourse")
+	public NgoOperationStatusDto deleteCourse(@RequestBody CourseOperationDto coursedto){
+		Course c=services.findCourseByCourseId(coursedto.getCourseId());
+		NGO ngo=services.findanNGOByEmail(coursedto.getNgoEmail());
+		try {
+			services.deleteCourse(c, ngo);
+			NgoOperationStatusDto status=new NgoOperationStatusDto();
+			status.setMessage("Course deletion successful!");
+			status.setStatus(StatusType.SUCCESS);
+			status.setNgoName(ngo.getNgoName());
+			return status;
+		}
+		catch(WomenEmpowermentException e) {
+			NgoOperationStatusDto status=new NgoOperationStatusDto();
+			status.setMessage("Course deletion unsuccessful!");
+			status.setStatus(StatusType.FAILURE);
+			status.setNgoName(ngo.getNgoName());
+            return status;
+		}
+	}
+	@RequestMapping("/viewAllUsers")
+	public List<User> viewAllUsers(){
+		try {
+			List<User> users=services.viewAllUsers();
+			return users;
+		}
+		catch(WomenEmpowermentException e) {
+            return null;
+		}
+	}
+	@RequestMapping("/viewAllNGOs")
+	public List<NGO> viewAllNGOs(){
+		try {
+			List<NGO> ngos=services.viewAllNGOs();
+			return ngos;
+		}
+		catch(WomenEmpowermentException e) {
+            return null;
+		}
+	}
+	@RequestMapping("/viewAllCourses")
+	public List<Course> viewAllCourses(){
+		try {
+			List<Course> courses=services.viewAllCourses();
+			return courses;
+		}
+		catch(WomenEmpowermentException e) {
+            return null;
+		}
+	}
+	@RequestMapping("/viewCoursesByNGO")
+	public List<Course> viewCoursesByNGO(NGOStatusDto ngodto){
+		int id=ngodto.getNgoId();
+		try {
+			List<Course> courses=services.viewCourseByNGO(id);
+			return courses;
+		}
+		catch(WomenEmpowermentException e) {
+            return null;
+		}
+	}
+	@RequestMapping("/viewCoursesBySector")
+	public List<Course> viewCoursesBySector(CourseOperationDto coursedto){
+		String sector=coursedto.getTrainingSector();
+		try {
+			List<Course> courses=services.viewCourseBySector(sector);
+			return courses;
+		}
+		catch(WomenEmpowermentException e) {
+            return null;
 		}
 	}
 }

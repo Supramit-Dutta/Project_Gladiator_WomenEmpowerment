@@ -3,10 +3,12 @@ package com.lti.entity;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -17,7 +19,7 @@ public class NGO {
 	@Id
 	@SequenceGenerator(name = "ngo_seq", initialValue = 3001, allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ngo_seq")
-	int ngoId;
+	public int ngoId;
 	
 	String ngoApplicationStatus;
 	String ngoName;
@@ -27,7 +29,8 @@ public class NGO {
 	String ngoLocation;
 	String ngoEmail;
 	
-	@OneToMany(mappedBy="ngo",cascade=CascadeType.ALL)
+	
+	@OneToMany(mappedBy="ngo",cascade=CascadeType.ALL,fetch=FetchType.LAZY)
 	List<Course> courses;
 	
 	

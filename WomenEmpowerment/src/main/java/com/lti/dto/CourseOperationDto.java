@@ -1,43 +1,17 @@
-package com.lti.entity;
+package com.lti.dto;
 
 import java.time.LocalDate;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 
-@Entity
-@Table(name="table_course")
-public class Course {
-	
-	@Id
-	@SequenceGenerator(name = "course_seq", initialValue = 2001, allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "course_seq")
+public class CourseOperationDto {
+
 	int courseId;
-	
 	String courseName;
 	LocalDate courseStartDate;
 	LocalDate courseEndDate;
 	String courseProvidingNGO;
 	String courseBenefits;
 	String trainingSector;
-	
-	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="ngo_id")
-	NGO ngo;
-	
-	
-	public NGO getNgo() {
-		return ngo;
-	}
-	public void setNgo(NGO ngo) {
-		this.ngo = ngo;
-	}
+	String ngoEmail;
 	public int getCourseId() {
 		return courseId;
 	}
@@ -79,5 +53,11 @@ public class Course {
 	}
 	public void setTrainingSector(String trainingSector) {
 		this.trainingSector = trainingSector;
+	}
+	public String getNgoEmail() {
+		return ngoEmail;
+	}
+	public void setNgoEmail(String ngoEmail) {
+		this.ngoEmail = ngoEmail;
 	}
 }

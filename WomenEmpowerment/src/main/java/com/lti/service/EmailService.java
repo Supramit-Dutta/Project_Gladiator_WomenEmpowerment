@@ -13,7 +13,7 @@ public class EmailService {
 	
     public void sendEmailForNewRegistration(String email,String text,String subject) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("duttasupramit@gmail.com");
+        message.setFrom("organization.weempoweryou@gmail.com");
         message.setTo(email);
         message.setSubject(subject);
         message.setText(text);
@@ -21,7 +21,7 @@ public class EmailService {
     }
     public void sendEmailForOTP(String email,String text,String subject) {
     	SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("duttasupramit@gmail.com");
+        message.setFrom("organization.weempoweryou@gmail.com");
         message.setTo(email);
         message.setSubject(subject);
         message.setText(text);

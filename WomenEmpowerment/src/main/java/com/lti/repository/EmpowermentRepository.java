@@ -20,9 +20,9 @@ public interface EmpowermentRepository {
 	public int approveSukanyaScheme(SukanyaYojna sukanya);
 	public int registerAnNGO(NGO ngo);
 	public User logInUser(String userEmail,String userPassword);
-	public void addACourse(Course course);
-	public void editACourse(Course course);
-	public void deleteACourse(int courseId);
+	public int addACourse(Course course);
+	public int editACourse(Course course);
+	public int deleteACourse(int courseId);
 	public Course findACourse(int courseId);
 	public List<Enroll> viewAllEnrollment();
 	public List<User> viewAllUsers();
@@ -45,4 +45,6 @@ public interface EmpowermentRepository {
 	public int updateAdminPassword(String email,String newPassword);
 	public boolean isUserPresent(String email);
 	public boolean isNGOPresent(String email);
+	public NGO findNGOByEmail(String email);
+	public boolean isCoursePresent(String courseName);
 }

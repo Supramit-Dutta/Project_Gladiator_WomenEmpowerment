@@ -8,7 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -30,10 +32,22 @@ public class User {
 	String userMaritalStatus;
 	String userNationality;
 	
+	@OneToOne
+	@JoinColumn(name="ngo_id")
+	NGO ngo;
+	
 	@OneToMany(mappedBy="user",cascade=CascadeType.ALL)
 	List<Enroll> enrolls;
 	
 	
+	public NGO getNgo() {
+		return ngo;
+	}
+
+	public void setNgo(NGO ngo) {
+		this.ngo = ngo;
+	}
+
 	public List<Enroll> getEnrolls() {
 		return enrolls;
 	}
