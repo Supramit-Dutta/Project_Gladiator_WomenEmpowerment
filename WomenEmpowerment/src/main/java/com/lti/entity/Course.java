@@ -14,7 +14,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name="table_course")
+@Table(name="table_course_we1")
 public class Course {
 	
 	@Id
