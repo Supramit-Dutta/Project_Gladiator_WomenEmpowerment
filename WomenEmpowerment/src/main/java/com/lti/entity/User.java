@@ -40,6 +40,7 @@ public class User {
 	NGO ngo;
 	
 	@OneToMany(mappedBy="user",cascade=CascadeType.ALL)
+	@JsonIgnore
 	List<Enroll> enrolls;
 	
 	@JsonIgnore
@@ -51,6 +52,7 @@ public class User {
 		this.ngo = ngo;
 	}
 
+	@JsonIgnore
 	public List<Enroll> getEnrolls() {
 		return enrolls;
 	}

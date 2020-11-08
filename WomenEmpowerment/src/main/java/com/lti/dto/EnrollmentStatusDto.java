@@ -3,8 +3,23 @@ package com.lti.dto;
 public class EnrollmentStatusDto extends StatusDto {
 	int userId;
 	int ngoId;
+	int courseId;
 	String ngoName;
 	String courseName;
+	String employmentStatus;
+	
+	public String getEmploymentStatus() {
+		return employmentStatus;
+	}
+	public void setEmploymentStatus(String employmentStatus) {
+		this.employmentStatus = employmentStatus;
+	}
+	public int getCourseId() {
+		return courseId;
+	}
+	public void setCourseId(int courseId) {
+		this.courseId = courseId;
+	}
 	public int getUserId() {
 		return userId;
 	}

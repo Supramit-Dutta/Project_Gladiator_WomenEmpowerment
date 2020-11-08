@@ -55,17 +55,9 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	}
 
 	@Transactional
-	public void applyEnrollmentForCourse(Enroll enroll, Course course) {
-		if(course == null){
-			System.out.println("Course not Found. Enter courseId from the List/Table");
-		}
-		else{
-			enroll.setUserEnrollmentStatus("Not Approved");
-			enroll.setCourse(course);
-			enroll.setEnrollmentDate(LocalDate.now());
-			em.merge(enroll) ;  //use enrollemntDate as localdate.now() while testing  
-			System.out.println("User enrolled."); //while testing input Enrollment status as Approval Pending 	
-		}
+	public Enroll applyEnrollmentForCourse(Enroll enroll) {
+			Enroll enrollment=em.merge(enroll) ;  //use enrollemntDate as localdate.now() while testing  
+			return enrollment; //while testing input Enrollment status as Approval Pending 	
 	}
 
 	@Transactional
@@ -81,7 +73,14 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 				Query query = em.createQuery(jpql) ;
 				query.setParameter("eid", enroll.getEnrollmentId());
 				y=query.executeUpdate() ;
-			}	
+			}
+			else {
+				String jpql = "UPDATE Enroll en SET en.userEnrollmentStatus = 'Rejected' "	+ "WHERE en.enrollmentId=:eid";
+				Query query = em.createQuery(jpql) ;
+				query.setParameter("eid", enroll.getEnrollmentId());
+				y=query.executeUpdate() ;
+				y=0;
+			}
 		}
 		return y;
 	}
@@ -229,8 +228,7 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 
 	
 	public List<Enroll> viewAllEnrollment() {
-		Query query = em.createQuery("select e from Enroll e where e.userEnrollmentStatus=:stat" , Enroll.class) ;
-		query.setParameter("stat","Approved");
+		Query query = em.createQuery("select e from Enroll e" , Enroll.class);
 		return query.getResultList() ;
 	}
 
@@ -311,7 +309,7 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	}
 
 	public List<NGO> viewAllNGO() {
-		Query query = em.createQuery("select n from NGO n LEFT JOIN FETCH n.courses" , NGO.class) ;
+		Query query = em.createQuery("select n from NGO n" , NGO.class) ;
 		return query.getResultList();
 	}
 	
@@ -397,5 +395,13 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 		query.setParameter("uid",userId);
 		int x=query.executeUpdate();
 		return x;
+	}
+	public boolean isAlreadyEnrolled(int userId,int courseId) {
+		String jpql = "select count(e.enrollmentId) from Enroll e where user_id=:uid and course_id=:cid";
+		Query query = em.createQuery(jpql) ;
+		query.setParameter("uid",userId);
+		query.setParameter("cid",courseId);
+		return (Long)
+                query.getSingleResult() == 1 ? true : false;
 	}
 }

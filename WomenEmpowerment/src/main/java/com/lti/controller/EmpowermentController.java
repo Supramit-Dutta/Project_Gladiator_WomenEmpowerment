@@ -1,5 +1,7 @@
 package com.lti.controller;
 
+import java.time.LocalDate;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +22,11 @@ import com.lti.dto.NgoOperationStatusDto;
 import com.lti.dto.StatusDto;
 import com.lti.dto.StatusDto.StatusType;
 import com.lti.entity.Course;
+import com.lti.entity.Enroll;
 import com.lti.entity.NGO;
 import com.lti.entity.User;
 import com.lti.exception.WomenEmpowermentException;
+import com.lti.service.EmailService;
 import com.lti.service.ForgotPasswordService;
 import com.lti.service.WomenEmpowermentService;
 
@@ -35,6 +39,9 @@ public class EmpowermentController {
 	
 	@Autowired
 	ForgotPasswordService forgotservice;
+	
+	@Autowired
+	EmailService emailService;
 	
 	boolean userOTPSent,ngoOTPSent,adminOTPSent;
 	boolean userVerified,ngoVerified,adminVerified;
@@ -441,6 +448,80 @@ public class EmpowermentController {
 			status.setStatus(StatusType.FAILURE);
             return status;
 		}
-		
+	}
+	@RequestMapping("/applyEnroll")
+	public EnrollmentStatusDto applyForEnroll(@RequestBody EnrollmentStatusDto enrolldto) {
+		User u=services.findUserById(enrolldto.getUserId());
+		Course c=services.findCourseById(enrolldto.getCourseId());
+		try {
+			if((u!=null)&&(c!=null)) {
+				Enroll e=new Enroll();
+				e.setCourse(c);
+				e.setEnrollmentDate(LocalDate.now());
+				e.setUser(u);
+				e.setUserEmploymentStatus(enrolldto.getEmploymentStatus());
+				e.setUserEnrollmentStatus("Not Approved");
+				services.applyEnroll(e, enrolldto.getUserId(),enrolldto.getCourseId());
+				EnrollmentStatusDto status=new EnrollmentStatusDto();
+				status.setCourseName(c.getCourseName());
+				status.setMessage("Enrollment Application successful");
+				status.setStatus(StatusType.SUCCESS);
+				return status;
+			}
+			EnrollmentStatusDto status=new EnrollmentStatusDto();
+			status.setMessage("CourseId/UserId doesn't exist");
+			status.setStatus(StatusType.FAILURE);
+			return status;
+		}
+		catch(WomenEmpowermentException e) {
+			EnrollmentStatusDto status=new EnrollmentStatusDto();
+			status.setMessage("Enrollment Application unsuccessful!");
+			status.setStatus(StatusType.FAILURE);
+            return status;
+		}
+	}
+	@RequestMapping("/approveEnroll")
+	public EnrollmentStatusDto approveEnrollment() {
+		int approvedcount=0,rejectedcount=0;
+		try {
+			List<Enroll> unapprovedlist=services.getUnApprovedEnrolls();
+			Iterator<Enroll> items=unapprovedlist.iterator();
+			while(items.hasNext()) {
+				Enroll singleunapproved=items.next();
+				int y=services.approveEnroll(singleunapproved);
+				if(y==1) {
+					approvedcount++;
+					String text="Your application for enrollment is approved. Your enrollment id is: "+singleunapproved.getEnrollmentId();
+		            String subject="Enrollment Confirmation";
+		            emailService.sendEmailForNewRegistration(singleunapproved.getUser().getUserEmail(), text, subject);
+				}	
+				else {
+					rejectedcount++;
+					String text="Your application for enrollment is rejected.";
+		            String subject="Enrollment Rejection Confirmation";
+		            emailService.sendEmailForNewRegistration(singleunapproved.getUser().getUserEmail(), text, subject);
+				}
+			}
+			EnrollmentStatusDto status=new EnrollmentStatusDto();
+			status.setMessage(approvedcount+" enrollments approved and "+rejectedcount+" enrollments rejected!!");
+			status.setStatus(StatusType.SUCCESS);
+			return status;
+		}
+		catch(WomenEmpowermentException e) {
+			EnrollmentStatusDto status=new EnrollmentStatusDto();
+			status.setMessage("Enrollment Approval unsuccessful!");
+			status.setStatus(StatusType.FAILURE);
+            return status;
+		}
+	}
+	@RequestMapping("/viewAllEnrollments")
+	public List<Enroll> viewAllEnrollments(){
+		try {
+			List<Enroll> enrolls=services.viewAllEnrolls();
+			return enrolls;
+		}
+		catch(WomenEmpowermentException e) {
+            return null;
+		}
 	}
 }

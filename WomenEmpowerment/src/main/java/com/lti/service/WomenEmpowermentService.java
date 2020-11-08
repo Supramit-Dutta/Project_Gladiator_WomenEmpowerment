@@ -3,6 +3,7 @@ package com.lti.service;
 import java.util.List;
 
 import com.lti.entity.Course;
+import com.lti.entity.Enroll;
 import com.lti.entity.NGO;
 import com.lti.entity.User;
 
@@ -34,4 +35,8 @@ public interface WomenEmpowermentService {
 	public NGO findNGOById(int userId);
 	public void RegisterWithNgo(User user,NGO ngo);
 	public Course findCourseById(int courseId);
+	public void applyEnroll(Enroll enroll,int userId,int courseId);
+	public List<Enroll> getUnApprovedEnrolls();
+	public int approveEnroll(Enroll e);
+	public List<Enroll> viewAllEnrolls();
 }

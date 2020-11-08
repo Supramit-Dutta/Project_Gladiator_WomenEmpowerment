@@ -9,6 +9,7 @@ import org.springframework.data.repository.config.CustomRepositoryImplementation
 import org.springframework.stereotype.Service;
 
 import com.lti.entity.Course;
+import com.lti.entity.Enroll;
 import com.lti.entity.NGO;
 import com.lti.entity.User;
 import com.lti.exception.WomenEmpowermentException;
@@ -232,5 +233,31 @@ public class WomenEmpowermentServiceImpl implements WomenEmpowermentService {
 	public Course findCourseById(int courseId) {
 		Course c=repo.findACourse(courseId);
 		return c;
+	}
+	public void applyEnroll(Enroll enroll,int userId,int courseId) {
+		if(!repo.isAlreadyEnrolled(userId, courseId)) {
+			Enroll e=repo.applyEnrollmentForCourse(enroll);
+			User user=repo.findAUser(userId);
+			if(e!=null) {
+				String text="Your application for enrollment is received. You will get an approval soon.";
+	            String subject="Enrollment Application Confirmation";
+	            emailService.sendEmailForNewRegistration(user.getUserEmail(), text, subject);
+			}
+		}
+		else
+			throw new WomenEmpowermentException("You are already enrolled in the course!");
+		
+	}
+	public List<Enroll> getUnApprovedEnrolls(){
+		List<Enroll> unapp=repo.findNotApprovedEnroll();
+		return unapp;
+	}
+	public int approveEnroll(Enroll e) {
+		int x=repo.approveEnrollment(e);
+		return x;
+	}
+	public List<Enroll> viewAllEnrolls(){
+		List<Enroll> enrolls=repo.viewAllEnrollment();
+		return enrolls;
 	}
 }

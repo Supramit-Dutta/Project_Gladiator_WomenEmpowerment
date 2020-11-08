@@ -11,6 +11,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "table_enroll")
 public class Enroll {
@@ -26,19 +28,22 @@ public class Enroll {
 	
 	@ManyToOne
 	@JoinColumn(name="user_id")
+	@JsonIgnore
 	User user;
 	
 	@OneToOne
 	@JoinColumn(name="course_id")
+	@JsonIgnore
 	Course course;
 	
-	
+	@JsonIgnore
 	public Course getCourse() {
 		return course;
 	}
 	public void setCourse(Course course) {
 		this.course = course;
 	}
+	@JsonIgnore
 	public User getUser() {
 		return user;
 	}

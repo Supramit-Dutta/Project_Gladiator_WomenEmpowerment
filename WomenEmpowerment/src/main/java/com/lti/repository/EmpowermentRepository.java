@@ -12,7 +12,7 @@ public interface EmpowermentRepository {
 
 	public int registerAUser(User user);
 	public List<Course> viewAllCourses();
-	public void applyEnrollmentForCourse(Enroll enroll,Course course);
+	public Enroll applyEnrollmentForCourse(Enroll enroll);
 	public int approveEnrollment(Enroll enroll);
 	public void applyAccomodation(Accomodation accomodation);
 	public int approveAccomodation(Accomodation acc);
@@ -49,4 +49,5 @@ public interface EmpowermentRepository {
 	public boolean isCoursePresent(String courseName);
 	public boolean isAlreadyRegisteredWithNgo(int ngoId);
 	public int deleteANonRegisteredUser(int userId);
+	public boolean isAlreadyEnrolled(int userId,int courseId);
 }
