@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lti.dto.CourseOperationDto;
+import com.lti.dto.EnrollmentStatusDto;
 import com.lti.dto.ForgotStatusDto;
 import com.lti.dto.LoginDto;
 import com.lti.dto.LoginStatusDto;
@@ -324,7 +325,7 @@ public class EmpowermentController {
 	}
 	@RequestMapping("/editCourse")
 	public NgoOperationStatusDto editCourse(@RequestBody CourseOperationDto coursedto){
-		Course c=new Course();
+		Course c=services.findCourseByCourseId(coursedto.getCourseId());
 		NGO ngo=services.findanNGOByEmail(coursedto.getNgoEmail());
 		c.setCourseName(coursedto.getCourseName());
 		c.setCourseBenefits(coursedto.getCourseBenefits());
@@ -400,8 +401,9 @@ public class EmpowermentController {
 		}
 	}
 	@RequestMapping("/viewCoursesByNGO")
-	public List<Course> viewCoursesByNGO(NGOStatusDto ngodto){
+	public List<Course> viewCoursesByNGO(@RequestBody NGOStatusDto ngodto){
 		int id=ngodto.getNgoId();
+		System.out.println(id);
 		try {
 			List<Course> courses=services.viewCourseByNGO(id);
 			return courses;
@@ -411,7 +413,7 @@ public class EmpowermentController {
 		}
 	}
 	@RequestMapping("/viewCoursesBySector")
-	public List<Course> viewCoursesBySector(CourseOperationDto coursedto){
+	public List<Course> viewCoursesBySector(@RequestBody CourseOperationDto coursedto){
 		String sector=coursedto.getTrainingSector();
 		try {
 			List<Course> courses=services.viewCourseBySector(sector);
@@ -420,5 +422,25 @@ public class EmpowermentController {
 		catch(WomenEmpowermentException e) {
             return null;
 		}
+	}
+	@RequestMapping("/registerWithAnNgo")
+	public EnrollmentStatusDto registerWithAnNGO(@RequestBody EnrollmentStatusDto enrolldto) {
+		User user=services.findUserById(enrolldto.getUserId());
+		NGO ngo=services.findNGOById(enrolldto.getNgoId());
+		try {
+				services.RegisterWithNgo(user, ngo);
+				EnrollmentStatusDto status=new EnrollmentStatusDto();
+				status.setMessage("You are registered with "+ngo.getNgoName());
+				status.setStatus(StatusType.SUCCESS);
+				status.setNgoName(ngo.getNgoName());
+				return status;
+		}
+		catch(WomenEmpowermentException e) {
+			EnrollmentStatusDto status=new EnrollmentStatusDto();
+			status.setMessage("User NGO registration unsuccessful!User registered with an NGO");
+			status.setStatus(StatusType.FAILURE);
+            return status;
+		}
+		
 	}
 }

@@ -47,4 +47,6 @@ public interface EmpowermentRepository {
 	public boolean isNGOPresent(String email);
 	public NGO findNGOByEmail(String email);
 	public boolean isCoursePresent(String courseName);
+	public boolean isAlreadyRegisteredWithNgo(int ngoId);
+	public int deleteANonRegisteredUser(int userId);
 }

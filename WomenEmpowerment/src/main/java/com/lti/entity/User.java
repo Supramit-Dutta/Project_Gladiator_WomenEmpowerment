@@ -14,6 +14,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "table_user")
 public class User {
@@ -34,12 +36,13 @@ public class User {
 	
 	@OneToOne
 	@JoinColumn(name="ngo_id")
+	@JsonIgnore
 	NGO ngo;
 	
 	@OneToMany(mappedBy="user",cascade=CascadeType.ALL)
 	List<Enroll> enrolls;
 	
-	
+	@JsonIgnore
 	public NGO getNgo() {
 		return ngo;
 	}

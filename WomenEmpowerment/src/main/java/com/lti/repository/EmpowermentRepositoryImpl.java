@@ -304,7 +304,7 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	}
 
 	public List<Course> viewCourseByNGO(int ngoId) {
-		String jpql="select c from Course c where c.ngo.ngoId=:nid";
+		String jpql="select c from Course c where ngo_Id=:nid";
 		TypedQuery<Course> query=em.createQuery(jpql, Course.class);
 		query.setParameter("nid", ngoId);
 		return query.getResultList();
@@ -381,5 +381,21 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 		TypedQuery<NGO> query=em.createQuery(jpql, NGO.class);
 		query.setParameter("nel", email);
 		return query.getSingleResult();
+	}
+	
+	public boolean isAlreadyRegisteredWithNgo(int userId) {
+		return (Long)
+                em
+                .createQuery("select count(u.userId) from User u where u.userId=:uid and ngo_id IS NULL")
+                .setParameter("uid", userId)
+                .getSingleResult() == 1 ? true : false;
+	}
+	@Transactional
+	public int deleteANonRegisteredUser(int userId) {
+		String jpql="delete from User u where u.userId=:uid";
+		Query query=em.createQuery(jpql);
+		query.setParameter("uid",userId);
+		int x=query.executeUpdate();
+		return x;
 	}
 }

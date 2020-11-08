@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.repository.config.CustomRepositoryImplementationDetector;
 import org.springframework.stereotype.Service;
 
 import com.lti.entity.Course;
@@ -207,5 +208,29 @@ public class WomenEmpowermentServiceImpl implements WomenEmpowermentService {
 		List<Course> courses=repo.viewCourseByNGO(ngoId);
 		return courses;
 	} 
-	
+	public User findUserById(int userId) {
+		User user=repo.findAUser(userId);
+		return user;
+	}
+	public NGO findNGOById(int ngoId) {
+		NGO ngo=repo.findAnNGO(ngoId);
+		return ngo;
+	}
+	public void RegisterWithNgo(User user,NGO ngo) {
+		int oldId=user.getUserId();
+		if(repo.isAlreadyRegisteredWithNgo(user.getUserId())) {
+			user.setNgo(ngo);
+			int newId=repo.registerAUser(user);
+			System.out.println(user.getNgo().getNgoName());
+			String text="You have been registered with an NGO. Your NGO name is "+ngo.getNgoName();
+            String subject="NGO-User Registration Confirmation";
+            emailService.sendEmailForNewRegistration(user.getUserEmail(), text, subject);
+		}
+		else
+			throw new WomenEmpowermentException("NGO-User registration unsuccessful");
+	}
+	public Course findCourseById(int courseId) {
+		Course c=repo.findACourse(courseId);
+		return c;
+	}
 }

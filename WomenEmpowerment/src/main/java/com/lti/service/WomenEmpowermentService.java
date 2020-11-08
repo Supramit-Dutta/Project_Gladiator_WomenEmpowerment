@@ -30,4 +30,8 @@ public interface WomenEmpowermentService {
 	public List<Course> viewAllCourses();
 	public List<Course> viewCourseBySector(String trainingSector);
 	public List<Course> viewCourseByNGO(int ngoId);
+	public User findUserById(int userId);
+	public NGO findNGOById(int userId);
+	public void RegisterWithNgo(User user,NGO ngo);
+	public Course findCourseById(int courseId);
 }

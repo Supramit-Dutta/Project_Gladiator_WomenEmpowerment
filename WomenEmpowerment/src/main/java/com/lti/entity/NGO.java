@@ -12,6 +12,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "table_ngo")
 public class NGO {
@@ -29,11 +31,11 @@ public class NGO {
 	String ngoLocation;
 	String ngoEmail;
 	
-	
+	@JsonIgnore
 	@OneToMany(mappedBy="ngo",cascade=CascadeType.ALL,fetch=FetchType.LAZY)
 	List<Course> courses;
 	
-	
+	@JsonIgnore
 	public List<Course> getCourses() {
 		return courses;
 	}

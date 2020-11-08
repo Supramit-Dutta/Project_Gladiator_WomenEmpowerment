@@ -11,6 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="table_course")
 public class Course {
@@ -29,9 +31,10 @@ public class Course {
 	
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="ngo_id")
+	@JsonIgnore
 	NGO ngo;
 	
-	
+	@JsonIgnore
 	public NGO getNgo() {
 		return ngo;
 	}
