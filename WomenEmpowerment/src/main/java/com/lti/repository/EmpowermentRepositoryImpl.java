@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import com.lti.entity.Accomodation;
 import com.lti.entity.Course;
 import com.lti.entity.Enroll;
+import com.lti.entity.HomeList;
 import com.lti.entity.NGO;
 import com.lti.entity.SukanyaYojna;
 import com.lti.entity.User;
@@ -86,9 +87,9 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	}
 
 	@Transactional
-	public void applyAccomodation(Accomodation accomodation) {
-		em.merge(accomodation) ;
-		System.out.println("Accomodation request sent.");
+	public Accomodation applyAccomodation(Accomodation accomodation) {
+		Accomodation a=em.merge(accomodation) ;
+		return a;
 	}
 
 	@Transactional
@@ -167,19 +168,26 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	}
 
 	@Transactional
-	public void applySukanyaScheme(SukanyaYojna sukanya) {
-		em.merge(sukanya) ;
-		System.out.println("Application request for Sukanya Samriddhi Yojna sent.");
+	public SukanyaYojna applySukanyaScheme(SukanyaYojna sukanya) {
+		SukanyaYojna s=em.merge(sukanya) ;
+		return s;
 	}
 
 	@Transactional
 	public int approveSukanyaScheme(SukanyaYojna sukanya) {
 		int y=0;
-		if((sukanya.getGirlChildNationality().equals("India"))&&(sukanya.getGirlChildAge()<=10)) {
+		if((sukanya.getGirlChildNationality().equals("Indian"))&&(sukanya.getGirlChildAge()<=10)) {
 			String jpql = "UPDATE SukanyaYojna s SET s.applicationStatus = 'Approved' "	+ "WHERE s.schemeId=:sid";
 			Query query = em.createQuery(jpql) ;
 			query.setParameter("sid",sukanya.getSchemeId());
 			y=query.executeUpdate() ;
+		}
+		else {
+			String jpql = "UPDATE SukanyaYojna s SET s.applicationStatus = 'Rejected' "	+ "WHERE s.schemeId=:sid";
+			Query query = em.createQuery(jpql) ;
+			query.setParameter("sid", sukanya.getSchemeId());
+			y=query.executeUpdate() ;
+			y=0;
 		}
 		return y;
 	}
@@ -259,14 +267,14 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	public List<SukanyaYojna> viewNotApprovedSukanya() {
 		String jpql="select s from SukanyaYojna s where s.applicationStatus=:stat";
 		Query query=em.createQuery(jpql, SukanyaYojna.class);
-		query.setParameter("stat","Pending");
+		query.setParameter("stat","Not Approved");
 		return query.getResultList();
 	}
 
 	public List<Accomodation> viewNotApprovedAccomodation() {
 		String jpql="select a from Accomodation a where a.applicationStatus=:stat";
 		Query query=em.createQuery(jpql, Accomodation.class);
-		query.setParameter("stat","Pending");
+		query.setParameter("stat","Not Approved");
 		return query.getResultList();
 	}
 	
@@ -403,5 +411,75 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 		query.setParameter("cid",courseId);
 		return (Long)
                 query.getSingleResult() == 1 ? true : false;
+	}
+
+	public List<NGO> viewAllApprovedNGO() {
+		String jpql="select n from NGO n where n.ngoApplicationStatus=:stat";
+		Query query=em.createQuery(jpql, NGO.class);
+		query.setParameter("stat","Approved");
+		return query.getResultList();
+	}
+	public boolean isAlreadyAccomodated(int userId) {
+		String jpql = "select count(a.accomodationId) from Accomodation a where user_id=:uid";
+		Query query = em.createQuery(jpql);
+		query.setParameter("uid",userId);
+		return (Long)
+                query.getSingleResult() == 1 ? true : false;
+	}
+	@Transactional
+	public int addHome(HomeList home) {
+		HomeList h=em.merge(home);
+		return h.getCityId();
+	}
+	@Transactional
+	public int updateHome(HomeList home, int rooms, int delete) {
+		int oldrooms=home.getNumberOfRooms();
+		int newrooms;
+		if(delete==1) {
+			newrooms=oldrooms-rooms;
+		}
+		else {
+			newrooms=oldrooms+rooms;
+		}
+		int id=home.getCityId();
+		int y=0;
+		String jpql = "UPDATE HomeList h SET h.numberOfRooms=:nr"+" WHERE h.cityId=:cid";
+		Query query = em.createQuery(jpql) ;
+		query.setParameter("nr",newrooms);
+		query.setParameter("cid",id);
+		y=query.executeUpdate();
+		return y;
+	}
+	public HomeList findHomeByCityId(int cityId) {
+		return em.find(HomeList.class, cityId);
+	}
+	public boolean isHomeAlreadyPresent(String city) {
+		String jpql = "select count(h.cityId) from HomeList h where h.city=:c";
+		Query query = em.createQuery(jpql);
+		query.setParameter("c",city);
+		return (Long)
+                query.getSingleResult() == 1 ? true : false;
+	}
+	public List<HomeList> viewAllHomes() {
+		Query query = em.createQuery("select h from HomeList h" , HomeList.class) ;
+		return query.getResultList();
+	}
+	public boolean isAlreadyASukanya(int userId) {
+		String jpql = "select count(s.schemeId) from SukanyaYojna s where user_id=:uid";
+		Query query = em.createQuery(jpql);
+		query.setParameter("uid",userId);
+		return (Long)
+                query.getSingleResult() == 1 ? true : false;
+	}
+	public List<SukanyaYojna> viewSukanya() {
+		String jpql="select s from SukanyaYojna s";
+		Query query=em.createQuery(jpql, SukanyaYojna.class);
+		return query.getResultList();
+	}
+
+	public List<Accomodation> viewAccomodation() {
+		String jpql="select a from Accomodation a";
+		Query query=em.createQuery(jpql, Accomodation.class);
+		return query.getResultList();
 	}
 }

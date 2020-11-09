@@ -9,6 +9,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="table_accomodation_we1")
 public class Accomodation {
@@ -18,22 +20,40 @@ public class Accomodation {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "acc_seq")
 	int accomodationId;
 	
-	String areaOfResidence;
 	double grossIncomePerMonth;
 	String caste;
 	String husbandResidenceName;
 	String userResidenceName;
 	int numberOfGirlChildBelow18;
 	int numberOfBoyChildBelow5;
+	String accomodationCity;
 	String anyPhysicalChallenges;
 	String dayCareRequirements;
 	String applicationStatus;
 	String employmentStatus;
+	String areaOfResidence;
 	
 	@OneToOne
 	@JoinColumn(name="user_id")
+	@JsonIgnore
 	User user;
 
+	
+	public String getAreaOfResidence() {
+		return areaOfResidence;
+	}
+
+	public void setAreaOfResidence(String areaOfResidence) {
+		this.areaOfResidence = areaOfResidence;
+	}
+
+	public String getAccomodationCity() {
+		return accomodationCity;
+	}
+
+	public void setAccomodationCity(String accomodationCity) {
+		this.accomodationCity = accomodationCity;
+	}
 	public String getEmploymentStatus() {
 		return employmentStatus;
 	}
@@ -89,15 +109,6 @@ public class Accomodation {
 	public void setAccomodationId(int accomodationId) {
 		this.accomodationId = accomodationId;
 	}
-
-	public String getAreaOfResidence() {
-		return areaOfResidence;
-	}
-
-	public void setAreaOfResidence(String areaOfResidence) {
-		this.areaOfResidence = areaOfResidence;
-	}
-
 	public double getGrossIncomePerMonth() {
 		return grossIncomePerMonth;
 	}
@@ -128,7 +139,8 @@ public class Accomodation {
 	public void setDayCareRequirements(String dayCareRequirements) {
 		this.dayCareRequirements = dayCareRequirements;
 	}
-
+	
+	@JsonIgnore
 	public User getUser() {
 		return user;
 	}

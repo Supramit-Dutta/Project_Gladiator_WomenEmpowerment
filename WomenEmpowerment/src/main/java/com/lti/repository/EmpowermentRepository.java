@@ -4,6 +4,7 @@ import java.util.List;
 import com.lti.entity.Accomodation;
 import com.lti.entity.Course;
 import com.lti.entity.Enroll;
+import com.lti.entity.HomeList;
 import com.lti.entity.NGO;
 import com.lti.entity.SukanyaYojna;
 import com.lti.entity.User;
@@ -14,9 +15,9 @@ public interface EmpowermentRepository {
 	public List<Course> viewAllCourses();
 	public Enroll applyEnrollmentForCourse(Enroll enroll);
 	public int approveEnrollment(Enroll enroll);
-	public void applyAccomodation(Accomodation accomodation);
+	public Accomodation applyAccomodation(Accomodation accomodation);
 	public int approveAccomodation(Accomodation acc);
-	public void applySukanyaScheme(SukanyaYojna sukanya);
+	public SukanyaYojna applySukanyaScheme(SukanyaYojna sukanya);
 	public int approveSukanyaScheme(SukanyaYojna sukanya);
 	public int registerAnNGO(NGO ngo);
 	public User logInUser(String userEmail,String userPassword);
@@ -50,4 +51,14 @@ public interface EmpowermentRepository {
 	public boolean isAlreadyRegisteredWithNgo(int ngoId);
 	public int deleteANonRegisteredUser(int userId);
 	public boolean isAlreadyEnrolled(int userId,int courseId);
+	public List<NGO> viewAllApprovedNGO();
+	public boolean isAlreadyAccomodated(int userId);
+	public int addHome(HomeList home);
+	public int updateHome(HomeList home, int rooms, int delete);
+	public HomeList findHomeByCityId(int cityId);
+	public boolean isHomeAlreadyPresent(String city);
+	public List<HomeList> viewAllHomes();
+	public boolean isAlreadyASukanya(int userId);
+	public List<SukanyaYojna> viewSukanya();
+	public List<Accomodation> viewAccomodation();
 }

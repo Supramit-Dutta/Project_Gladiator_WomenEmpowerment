@@ -9,6 +9,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="table_sukanya_we1")
 public class SukanyaYojna {
@@ -25,6 +27,7 @@ public class SukanyaYojna {
 	
 	@OneToOne
 	@JoinColumn(name="user_id")
+	@JsonIgnore
 	User user;
 	
 	
@@ -40,6 +43,7 @@ public class SukanyaYojna {
 	public void setApplicationStatus(String applicationStatus) {
 		this.applicationStatus = applicationStatus;
 	}
+	@JsonIgnore
 	public User getUser() {
 		return user;
 	}

@@ -8,9 +8,12 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.repository.config.CustomRepositoryImplementationDetector;
 import org.springframework.stereotype.Service;
 
+import com.lti.entity.Accomodation;
 import com.lti.entity.Course;
 import com.lti.entity.Enroll;
+import com.lti.entity.HomeList;
 import com.lti.entity.NGO;
+import com.lti.entity.SukanyaYojna;
 import com.lti.entity.User;
 import com.lti.exception.WomenEmpowermentException;
 import com.lti.repository.EmpowermentRepository;
@@ -259,5 +262,78 @@ public class WomenEmpowermentServiceImpl implements WomenEmpowermentService {
 	public List<Enroll> viewAllEnrolls(){
 		List<Enroll> enrolls=repo.viewAllEnrollment();
 		return enrolls;
+	}
+	public List<NGO> viewAllApprovedNGO() {
+		List<NGO> ngos=repo.viewAllApprovedNGO();
+		return ngos;
+	}
+	public void applyAccomodation(Accomodation acc,int userId) {
+		if(!repo.isAlreadyAccomodated(userId)) {
+			Accomodation a=repo.applyAccomodation(acc);
+			User user=repo.findAUser(userId);
+			if(a!=null) {
+				String text="Your application for accomodation is received. You will get an approval soon.";
+	            String subject="Accomodation Application Confirmation";
+	            emailService.sendEmailForNewRegistration(user.getUserEmail(), text, subject);
+			}
+		}
+		else
+			throw new WomenEmpowermentException("You have already been provided accomodation!");
+	}
+	
+	public int addHome(HomeList home) {
+		if(!repo.isHomeAlreadyPresent(home.getCity())) {
+			int id=repo.addHome(home);
+			return id;
+		}
+		else {
+			throw new WomenEmpowermentException("City is already present!");
+		}
+	}
+
+	public int updateHome(HomeList home, int rooms, int delete) {
+		int x=repo.updateHome(home, rooms, delete);
+		if(x!=0)
+			return x;
+		else
+			throw new WomenEmpowermentException("Couldn't update");
+	}
+	
+	public HomeList findHomeByCityId(int cityId) {
+		HomeList h=repo.findHomeByCityId(cityId);
+		return h;
+	}
+	public List<HomeList> viewAllHomes(){
+		List<HomeList> homes=repo.viewAllHomes();
+		return homes;
+	}
+	public void applySukanya(SukanyaYojna sy,int userId) {
+		if(!repo.isAlreadyASukanya(userId)) {
+			SukanyaYojna s=repo.applySukanyaScheme(sy);
+			User user=repo.findAUser(userId);
+			if(s!=null) {
+				String text="Your application for Sukanya Yojna is received. You will get an approval soon.";
+	            String subject="Sukanya Yojna Application Confirmation";
+	            emailService.sendEmailForNewRegistration(user.getUserEmail(), text, subject);
+			}
+		}
+		else
+			throw new WomenEmpowermentException("You are already a part of Sukanya Yojna Scheme!");
+	}
+	public List<Accomodation> viewAccomodations(){
+		List<Accomodation> accs=repo.viewAccomodation();
+		return accs;
+	}
+	public List<SukanyaYojna> viewSukanyas(){
+		List<SukanyaYojna> suks=repo.viewSukanya();
+		return suks;
+	}
+	public List<SukanyaYojna> getUnApprovedSukanyas(){
+		List<SukanyaYojna> unapprovedsukanyas=repo.viewNotApprovedSukanya();
+		return unapprovedsukanyas;
+	}
+	public int approveSukanya(SukanyaYojna sy) {
+		int x=repo.approveSukanyaScheme(sy);
+		return x;
 	}
 }

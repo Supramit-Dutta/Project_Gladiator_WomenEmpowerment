@@ -12,18 +12,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lti.dto.AccomodationStatusDto;
 import com.lti.dto.CourseOperationDto;
 import com.lti.dto.EnrollmentStatusDto;
 import com.lti.dto.ForgotStatusDto;
+import com.lti.dto.HomeDto;
 import com.lti.dto.LoginDto;
 import com.lti.dto.LoginStatusDto;
 import com.lti.dto.NGOStatusDto;
 import com.lti.dto.NgoOperationStatusDto;
 import com.lti.dto.StatusDto;
 import com.lti.dto.StatusDto.StatusType;
+import com.lti.dto.SukanyaDto;
+import com.lti.entity.Accomodation;
 import com.lti.entity.Course;
 import com.lti.entity.Enroll;
+import com.lti.entity.HomeList;
 import com.lti.entity.NGO;
+import com.lti.entity.SukanyaYojna;
 import com.lti.entity.User;
 import com.lti.exception.WomenEmpowermentException;
 import com.lti.service.EmailService;
@@ -524,4 +530,193 @@ public class EmpowermentController {
             return null;
 		}
 	}
+	@RequestMapping("/viewAllApprovedNGOs")
+	public List<NGO> viewAllApprovedNGOs(){
+		try {
+			List<NGO> ngos=services.viewAllApprovedNGO();
+			return ngos;
+		}
+		catch(WomenEmpowermentException e) {
+            return null;
+		}
+	}
+	@RequestMapping("/checkNGOStatus")
+	public NGO checkNGOStatus(@RequestBody NGOStatusDto ngodto) {
+		try {
+			NGO ngo=services.findanNGOByEmail(ngodto.getNgoemail());
+			return ngo;
+		}
+		catch(WomenEmpowermentException e) {
+            return null;
+		}
+	}
+	@RequestMapping("/applyAccomodation")
+	public StatusDto applyAccomodation(@RequestBody AccomodationStatusDto accdto) {
+		User u=services.findUserById(accdto.getUserId());
+		try {
+			if(u!=null) {
+				Accomodation a=new Accomodation();
+				a.setAccomodationCity(accdto.getAccomodationCity());
+				a.setAnyPhysicalChallenges(accdto.getAnyPhysicalChallenges());
+				a.setApplicationStatus("Not Approved");
+				a.setAreaOfResidence(accdto.getAreaOfResidence());
+				a.setCaste(accdto.getCaste());
+				a.setDayCareRequirements(accdto.getDayCareRequirements());
+				a.setEmploymentStatus(accdto.getEmploymentStatus());
+				a.setGrossIncomePerMonth(accdto.getGrossIncomePerMonth());
+				a.setHusbandResidenceName(accdto.getHusbandResidenceName());
+				a.setNumberOfBoyChildBelow5(accdto.getNumberOfBoyChildBelow5());
+				a.setNumberOfGirlChildBelow18(accdto.getNumberOfGirlChildBelow18());
+				a.setUserResidenceName(accdto.getUserResidenceName());
+				a.setUser(u);
+				services.applyAccomodation(a, accdto.getUserId());
+				StatusDto status=new StatusDto();
+				status.setMessage("Application for accomodation received!");
+				status.setStatus(StatusType.SUCCESS);
+				return status;
+			}
+			StatusDto status=new StatusDto();
+			status.setMessage("UserId doesn't exist");
+			status.setStatus(StatusType.FAILURE);
+			return status;
+		}
+		catch(WomenEmpowermentException e) {
+			StatusDto status=new StatusDto();
+			status.setMessage("Enrollment Application unsuccessful!");
+			status.setStatus(StatusType.FAILURE);
+            return status;
+		}
+	}
+	@RequestMapping("/addHome")
+	public StatusDto addHome(@RequestBody HomeDto homedto){
+		HomeList h=new HomeList();
+		h.setCity(homedto.getCity());
+		h.setNumberOfRooms(homedto.getNumberOfRooms());
+		try {
+			services.addHome(h);
+			StatusDto status=new StatusDto();
+			status.setMessage("Home addition successful!");
+			status.setStatus(StatusType.SUCCESS);
+			return status;
+		}
+		catch(WomenEmpowermentException e) {
+			StatusDto status=new StatusDto();
+			status.setMessage("Home addition unsuccessful!");
+			status.setStatus(StatusType.FAILURE);
+            return status;
+		}
+	}
+	@RequestMapping("/updateHome")
+	public StatusDto updateHome(@RequestBody HomeDto homedto){
+		HomeList h=services.findHomeByCityId(homedto.getCityId());
+		int rooms=homedto.getNumberOfRooms();
+		int delete=homedto.getDelete();
+		try {
+			services.updateHome(h, rooms, delete);
+			StatusDto status=new StatusDto();
+			status.setMessage("Home updation successful!");
+			status.setStatus(StatusType.SUCCESS);
+			return status;
+		}
+		catch(WomenEmpowermentException e) {
+			StatusDto status=new StatusDto();
+			status.setMessage("Home updation unsuccessful!");
+			status.setStatus(StatusType.FAILURE);
+            return status;
+		}
+	}
+	@RequestMapping("/viewAllHomes")
+	public List<HomeList> viewAllHomes(){
+		try {
+			List<HomeList> homes=services.viewAllHomes();
+			return homes;
+		}
+		catch(WomenEmpowermentException e) {
+            return null;
+		}
+	}
+	@RequestMapping("/applySukanya")
+	public StatusDto applySukanya(@RequestBody SukanyaDto sukanyadto) {
+		User u=services.findUserById(sukanyadto.getUserId());
+		try {
+			if(u!=null) {
+				SukanyaYojna sy=new SukanyaYojna();
+				sy.setApplicationStatus("Not Approved");
+				sy.setGirlChildAge(sukanyadto.getGirlChildAge());
+				sy.setGirlChildNationality(sukanyadto.getGirlChildNationality());
+				sy.setInitialDepositAmount(sukanyadto.getInitialDepositAmount());
+				sy.setUser(u);
+				services.applySukanya(sy, sukanyadto.getUserId());
+				StatusDto status=new StatusDto();
+				status.setMessage("Application for Sukanya Yojna received!");
+				status.setStatus(StatusType.SUCCESS);
+				return status;
+			}
+			StatusDto status=new StatusDto();
+			status.setMessage("UserId doesn't exist");
+			status.setStatus(StatusType.FAILURE);
+			return status;
+		}
+		catch(WomenEmpowermentException e) {
+			StatusDto status=new StatusDto();
+			status.setMessage("Sukanya Yojna Application unsuccessful!");
+			status.setStatus(StatusType.FAILURE);
+            return status;
+		}
+	}
+	@RequestMapping("/viewAllAccomodations")
+	public List<Accomodation> viewAllAccomodations(){
+		try {
+			List<Accomodation> accs=services.viewAccomodations();
+			return accs;
+		}
+		catch(WomenEmpowermentException e) {
+            return null;
+		}
+	}
+	@RequestMapping("/viewAllSukanyas")
+	public List<SukanyaYojna> viewAllSukanyas(){
+		try {
+			List<SukanyaYojna> suks=services.viewSukanyas();
+			return suks;
+		}
+		catch(WomenEmpowermentException e) {
+            return null;
+		}
+	}
+	@RequestMapping("/approveSukanya")
+	public StatusDto approveSukanya() {
+		int approvedcount=0,rejectedcount=0;
+		try {
+			List<SukanyaYojna> unapprovedlist=services.getUnApprovedSukanyas();
+			Iterator<SukanyaYojna> items=unapprovedlist.iterator();
+			while(items.hasNext()) {
+				SukanyaYojna singleunapproved=items.next();
+				int y=services.approveSukanya(singleunapproved);
+				if(y==1) {
+					approvedcount++;
+					String text="Your application for Sukanya Yojna is approved. Your enrollment id is: "+singleunapproved.getSchemeId();
+		            String subject="Sukanya Yojna Scheme Confirmation";
+		            emailService.sendEmailForNewRegistration(singleunapproved.getUser().getUserEmail(), text, subject);
+				}	
+				else {
+					rejectedcount++;
+					String text="Your application for Sukanya Yojna is rejected.";
+		            String subject="Sukanya Yojna Rejection Confirmation";
+		            emailService.sendEmailForNewRegistration(singleunapproved.getUser().getUserEmail(), text, subject);
+				}
+			}
+			StatusDto status=new StatusDto();
+			status.setMessage(approvedcount+" sukanya applications are approved and "+rejectedcount+" sukanya application are rejected!!");
+			status.setStatus(StatusType.SUCCESS);
+			return status;
+		}
+		catch(WomenEmpowermentException e) {
+			EnrollmentStatusDto status=new EnrollmentStatusDto();
+			status.setMessage("Sukanya Yojna Approval unsuccessful!");
+			status.setStatus(StatusType.FAILURE);
+            return status;
+		}
+	}
+	
 }

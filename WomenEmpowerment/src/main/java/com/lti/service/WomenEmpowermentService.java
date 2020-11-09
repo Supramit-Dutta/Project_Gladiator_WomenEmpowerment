@@ -2,9 +2,12 @@ package com.lti.service;
 
 import java.util.List;
 
+import com.lti.entity.Accomodation;
 import com.lti.entity.Course;
 import com.lti.entity.Enroll;
+import com.lti.entity.HomeList;
 import com.lti.entity.NGO;
+import com.lti.entity.SukanyaYojna;
 import com.lti.entity.User;
 
 public interface WomenEmpowermentService {
@@ -39,4 +42,15 @@ public interface WomenEmpowermentService {
 	public List<Enroll> getUnApprovedEnrolls();
 	public int approveEnroll(Enroll e);
 	public List<Enroll> viewAllEnrolls();
+	public List<NGO> viewAllApprovedNGO();
+	public void applyAccomodation(Accomodation acc,int userId);
+	public int addHome(HomeList home);
+	public int updateHome(HomeList home, int rooms, int delete);
+	public HomeList findHomeByCityId(int cityId);
+	public List<HomeList> viewAllHomes();
+	public void applySukanya(SukanyaYojna sy,int userId);
+	public List<Accomodation> viewAccomodations();
+	public List<SukanyaYojna> viewSukanyas();
+	public List<SukanyaYojna> getUnApprovedSukanyas();
+	public int approveSukanya(SukanyaYojna sy);
 }
