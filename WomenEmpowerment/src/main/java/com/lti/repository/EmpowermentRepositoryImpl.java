@@ -464,11 +464,10 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	}
 	
 	public List<Accomodation> viewNotApprovedWorkingNonMetropolitan() {
-		String jpql="select a from Accomodation a where a.applicationStatus=:stat and a.grossIncomePerMonth<'35000' and a.areaOfResidence NOT LIKE :metro and a.employmentStatus=:emp";
+		String jpql="select a from Accomodation a where a.applicationStatus=:stat and a.grossIncomePerMonth<'35000' and a.employmentStatus=:emp";
 		Query query=em.createQuery(jpql);
 		query.setParameter("stat","Not Approved");
 		query.setParameter("emp","Employed");
-		query.setParameter("metro","Metropolitan");
 		return query.getResultList();
 	}
 	
@@ -482,38 +481,41 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	
 	@Transactional
 	public int approveAccomodation(Accomodation acc) {
-		int y1=0,y2=0;
-		String city=acc.getAccomodationCity();
-		System.out.println(city);
-		int rooms=acc.getNumberOfBoyChildBelow5()+acc.getNumberOfGirlChildBelow18()+1;
-		String jpql1="select h from HomeList h where h.city=:c";
-		Query query1=em.createQuery(jpql1);
-		query1.setParameter("c",city);
-		HomeList home=(HomeList)query1.getSingleResult();
-		if(home==null) {
-			return 0;
+		if(acc.getUser().getUserGender().equals("Female")) {
+			int y1=0,y2=0;
+			String city=acc.getAccomodationCity();
+			System.out.println(city);
+			int rooms=acc.getNumberOfBoyChildBelow5()+acc.getNumberOfGirlChildBelow18()+1;
+			String jpql1="select h from HomeList h where h.city=:c";
+			Query query1=em.createQuery(jpql1);
+			query1.setParameter("c",city);
+			HomeList home=(HomeList)query1.getSingleResult();
+			if(home==null) {
+				return 0;
+			}
+			int actualroom=home.getNumberOfRooms()-rooms;
+			if(actualroom<0) {
+				return 0;
+			}
+			home.setNumberOfRooms(actualroom);
+			
+			String jpql = "UPDATE Accomodation a SET a.applicationStatus = 'Approved' "	+ "WHERE a.accomodationId=:aid";
+			Query query = em.createQuery(jpql) ;
+			query.setParameter("aid",acc.getAccomodationId());
+			y1=query.executeUpdate();
+			
+			String jpql2 = "UPDATE HomeList h SET h.numberOfRooms=:nr "	+ "WHERE h.city=:cit";
+			Query query2 = em.createQuery(jpql2) ;
+			query2.setParameter("nr",home.getNumberOfRooms());
+			query2.setParameter("cit",city);
+			y2=query2.executeUpdate();
+			
+			if((y1==1)&&(y2==1))
+				return 1;
+			else
+				return 0;
 		}
-		int actualroom=home.getNumberOfRooms()-rooms;
-		if(actualroom<0) {
-			return 0;
-		}
-		home.setNumberOfRooms(actualroom);
-		
-		String jpql = "UPDATE Accomodation a SET a.applicationStatus = 'Approved' "	+ "WHERE a.accomodationId=:aid";
-		Query query = em.createQuery(jpql) ;
-		query.setParameter("aid",acc.getAccomodationId());
-		y1=query.executeUpdate();
-		
-		String jpql2 = "UPDATE HomeList h SET h.numberOfRooms=:nr "	+ "WHERE h.city=:cit";
-		Query query2 = em.createQuery(jpql2) ;
-		query2.setParameter("nr",home.getNumberOfRooms());
-		query2.setParameter("cit",city);
-		y2=query2.executeUpdate();
-		
-		if((y1==1)&&(y2==1))
-			return 1;
-		else
-			return 0;
+		return 0;
 	}
 	
 	@Transactional

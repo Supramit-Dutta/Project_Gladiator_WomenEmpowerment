@@ -440,6 +440,19 @@ public class EmpowermentController {
 	public EnrollmentStatusDto registerWithAnNGO(@RequestBody EnrollmentStatusDto enrolldto) {
 		User user=services.findUserById(enrolldto.getUserId());
 		NGO ngo=services.findNGOById(enrolldto.getNgoId());
+		if(ngo==null) {
+			EnrollmentStatusDto status=new EnrollmentStatusDto();
+			status.setMessage("Incorrect NGO Id. Choose one from the table");
+			status.setStatus(StatusType.FAILURE);
+			return status;
+		}
+		if(ngo.getNgoId()==user.getNgo().getNgoId()) {
+			EnrollmentStatusDto status=new EnrollmentStatusDto();
+			status.setMessage("You are registered with "+ngo.getNgoId());
+			status.setStatus(StatusType.SUCCESS);
+			status.setNgoName(ngo.getNgoName());
+			return status;
+		}
 		if(ngo!=null) {
 			try {
 				services.RegisterWithNgo(user, ngo);
@@ -453,14 +466,13 @@ public class EmpowermentController {
 				EnrollmentStatusDto status=new EnrollmentStatusDto();
 				status.setMessage("User NGO registration unsuccessful!User registered with an NGO");
 				status.setStatus(StatusType.FAILURE);
-	            return status;
+				return status;
 			}
 		}
 		EnrollmentStatusDto status=new EnrollmentStatusDto();
-		status.setMessage("User NGO registration unsuccessful!User registered with an NGO");
+		status.setMessage("Incorrect NGO Id. Choose one from the table");
 		status.setStatus(StatusType.FAILURE);
-        return status;
-		
+		return status;
 	}
 	@RequestMapping("/applyEnroll")
 	public EnrollmentStatusDto applyForEnroll(@RequestBody EnrollmentStatusDto enrolldto) {
@@ -922,5 +934,9 @@ public class EmpowermentController {
             return status;
 		}
 	}
-	
+	@RequestMapping("/viewNGOStatus")
+	public NGO viewNGOStatus(@RequestBody NGOStatusDto ngodto) {
+		NGO ngo=services.findanNGOByEmail(ngodto.getNgoemail());
+		return ngo;
+	}
 }
