@@ -440,20 +440,27 @@ public class EmpowermentController {
 	public EnrollmentStatusDto registerWithAnNGO(@RequestBody EnrollmentStatusDto enrolldto) {
 		User user=services.findUserById(enrolldto.getUserId());
 		NGO ngo=services.findNGOById(enrolldto.getNgoId());
-		try {
+		if(ngo!=null) {
+			try {
 				services.RegisterWithNgo(user, ngo);
 				EnrollmentStatusDto status=new EnrollmentStatusDto();
-				status.setMessage("You are registered with "+ngo.getNgoName());
+				status.setMessage("You are registered with "+ngo.getNgoId());
 				status.setStatus(StatusType.SUCCESS);
 				status.setNgoName(ngo.getNgoName());
 				return status;
+			}
+			catch(WomenEmpowermentException e) {
+				EnrollmentStatusDto status=new EnrollmentStatusDto();
+				status.setMessage("User NGO registration unsuccessful!User registered with an NGO");
+				status.setStatus(StatusType.FAILURE);
+	            return status;
+			}
 		}
-		catch(WomenEmpowermentException e) {
-			EnrollmentStatusDto status=new EnrollmentStatusDto();
-			status.setMessage("User NGO registration unsuccessful!User registered with an NGO");
-			status.setStatus(StatusType.FAILURE);
-            return status;
-		}
+		EnrollmentStatusDto status=new EnrollmentStatusDto();
+		status.setMessage("User NGO registration unsuccessful!User registered with an NGO");
+		status.setStatus(StatusType.FAILURE);
+        return status;
+		
 	}
 	@RequestMapping("/applyEnroll")
 	public EnrollmentStatusDto applyForEnroll(@RequestBody EnrollmentStatusDto enrolldto) {
@@ -714,6 +721,203 @@ public class EmpowermentController {
 		catch(WomenEmpowermentException e) {
 			EnrollmentStatusDto status=new EnrollmentStatusDto();
 			status.setMessage("Sukanya Yojna Approval unsuccessful!");
+			status.setStatus(StatusType.FAILURE);
+            return status;
+		}
+	}
+	
+	@RequestMapping("/approveAccomodation")
+	public StatusDto approveAccomodation() {
+		int accepted=0;
+		int rejected=0;
+		try {
+			List<Accomodation>acc;Iterator<Accomodation> items;
+			acc=services.viewNotApprovedWorkingPhysical();
+			items=acc.iterator();
+			while(items.hasNext()) {
+				Accomodation single=items.next();
+				int y=services.approveAccomodation(single);
+				if(y==1) {
+					accepted++;
+					System.out.println("Physical accepted!");
+					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
+							". Your address will be mailed soon.";
+		            String subject="Accomodation Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}	
+				else {
+					rejected++;
+					System.out.println("Physical rejected!");
+					String text="Your application for Accomodation is rejected.";
+		            String subject="Accomodation Rejection Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}
+			}
+			acc=services.viewNotApprovedWorkingST();
+			items=acc.iterator();
+			while(items.hasNext()) {
+				Accomodation single=items.next();
+				int y=services.approveAccomodation(single);
+				if(y==1) {
+					accepted++;
+					System.out.println("ST accepted!");
+					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
+							". Your address will be mailed soon.";
+		            String subject="Accomodation Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}	
+				else {
+					rejected++;
+					System.out.println("ST rejected!");
+					String text="Your application for Accomodation is rejected.";
+		            String subject="Accomodation Rejection Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}
+			}
+			acc=services.viewNotApprovedWorkingSC();
+			items=acc.iterator();
+			while(items.hasNext()) {
+				Accomodation single=items.next();
+				int y=services.approveAccomodation(single);
+				if(y==1) {
+					accepted++;
+					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
+							". Your address will be mailed soon.";
+		            String subject="Accomodation Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}	
+				else {
+					rejected++;
+					System.out.println("SC rejected!");
+					String text="Your application for Accomodation is rejected.";
+		            String subject="Accomodation Rejection Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}
+			}
+			acc=services.viewNotApprovedWorkingOBC();
+			items=acc.iterator();
+			while(items.hasNext()) {
+				Accomodation single=items.next();
+				int y=services.approveAccomodation(single);
+				if(y==1) {
+					accepted++;
+					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
+							". Your address will be mailed soon.";
+		            String subject="Accomodation Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}	
+				else {
+					rejected++;
+					System.out.println("OBC rejected!");
+					String text="Your application for Accomodation is rejected.";
+		            String subject="Accomodation Rejection Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}
+			}
+			acc=services.viewNotApprovedWorkingEWS();
+			items=acc.iterator();
+			while(items.hasNext()) {
+				Accomodation single=items.next();
+				int y=services.approveAccomodation(single);
+				if(y==1) {
+					accepted++;
+					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
+							". Your address will be mailed soon.";
+		            String subject="Accomodation Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}	
+				else {
+					rejected++;
+					System.out.println("EWS rejected!");
+					String text="Your application for Accomodation is rejected.";
+		            String subject="Accomodation Rejection Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}
+			}
+			acc=services.viewNotApprovedWorkingHusband();
+			items=acc.iterator();
+			while(items.hasNext()) {
+				Accomodation single=items.next();
+				int y=services.approveAccomodation(single);
+				if(y==1) {
+					accepted++;
+					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
+							". Your address will be mailed soon.";
+		            String subject="Accomodation Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}	
+				else {
+					rejected++;
+					System.out.println("Husband rejected!");
+					String text="Your application for Accomodation is rejected.";
+		            String subject="Accomodation Rejection Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}
+			}
+			acc=services.viewNotApprovedWorkingMetropolitan();
+			items=acc.iterator();
+			while(items.hasNext()) {
+				Accomodation single=items.next();
+				int y=services.approveAccomodation(single);
+				if(y==1) {
+					accepted++;
+					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
+							". Your address will be mailed soon.";
+		            String subject="Accomodation Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}	
+				else {
+					rejected++;
+					System.out.println("Metro rejected!");
+					String text="Your application for Accomodation is rejected.";
+		            String subject="Accomodation Rejection Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}
+			}
+			acc=services.viewNotApprovedWorkingNonMetropolitan();
+			if(acc==null)
+				System.out.println("List is null");
+			items=acc.iterator();
+			while(items.hasNext()) {
+				Accomodation single=items.next();
+				System.out.println(single.getAccomodationId());
+				int y=services.approveAccomodation(single);
+				if(y==1) {
+					accepted++;
+					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
+							". Your address will be mailed soon.";
+		            String subject="Accomodation Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}	
+				else {
+					rejected++;
+					System.out.println("Non-metro rejected!");
+					String text="Your application for Accomodation is rejected.";
+		            String subject="Accomodation Rejection Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}
+			}
+			acc=services.viewNotApprovedNotWorking();
+			items=acc.iterator();
+			while(items.hasNext()) {
+				Accomodation single=items.next();
+				int y=services.rejectAccomodation(single);
+				if(y==1) {
+					rejected++;
+					System.out.println("NotWorking rejected!");
+					String text="Your application for Accomodation is rejected.";
+		            String subject="Accomodation Rejection Confirmation";
+		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
+				}
+			}
+			StatusDto status=new StatusDto();
+			status.setMessage("Accomodation Approval successful!"+accepted+" approvals accepted and "+rejected+" approvals rejected!");
+			status.setStatus(StatusType.SUCCESS);
+            return status;
+		}
+		catch(WomenEmpowermentException e) {
+			StatusDto status=new StatusDto();
+			status.setMessage("Accomodation Approval unsuccessful!");
 			status.setStatus(StatusType.FAILURE);
             return status;
 		}

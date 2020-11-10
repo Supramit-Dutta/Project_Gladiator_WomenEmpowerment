@@ -16,7 +16,6 @@ public interface EmpowermentRepository {
 	public Enroll applyEnrollmentForCourse(Enroll enroll);
 	public int approveEnrollment(Enroll enroll);
 	public Accomodation applyAccomodation(Accomodation accomodation);
-	public int approveAccomodation(Accomodation acc);
 	public SukanyaYojna applySukanyaScheme(SukanyaYojna sukanya);
 	public int approveSukanyaScheme(SukanyaYojna sukanya);
 	public int registerAnNGO(NGO ngo);
@@ -32,7 +31,6 @@ public interface EmpowermentRepository {
 	public Enroll findAnEnrollment(int enrollmentId);
 	public List<Enroll> findNotApprovedEnroll();
 	public List<SukanyaYojna> viewNotApprovedSukanya();
-	public List<Accomodation> viewNotApprovedAccomodation();
 	public Accomodation findAccomodation(int accomodationId);
 	public SukanyaYojna findASukanya(int schemeId);
 	public NGO logInNGO(String ngoEmail,String ngoPassword);
@@ -61,4 +59,15 @@ public interface EmpowermentRepository {
 	public boolean isAlreadyASukanya(int userId);
 	public List<SukanyaYojna> viewSukanya();
 	public List<Accomodation> viewAccomodation();
+	public List<Accomodation> viewNotApprovedWorkingPhysical();
+	public List<Accomodation> viewNotApprovedWorkingST();
+	public List<Accomodation> viewNotApprovedWorkingSC();
+	public List<Accomodation> viewNotApprovedWorkingOBC();
+	public List<Accomodation> viewNotApprovedWorkingEWS();
+	public List<Accomodation> viewNotApprovedWorkingHusband();
+	public List<Accomodation> viewNotApprovedWorkingMetropolitan();
+	public List<Accomodation> viewNotApprovedWorkingNonMetropolitan();
+	public List<Accomodation> viewNotApprovedNotWorking();
+	public int approveAccomodation(Accomodation acc);
+	public int rejectAccomodation(Accomodation acc);
 }

@@ -24,7 +24,7 @@ import com.lti.entity.User;
 public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	
 	@PersistenceContext
-	EntityManager em ;
+	EntityManager em,em1 ;
 	
 	int maxAccomodation;
 	int reservedAccomodation;
@@ -90,81 +90,6 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	public Accomodation applyAccomodation(Accomodation accomodation) {
 		Accomodation a=em.merge(accomodation) ;
 		return a;
-	}
-
-	@Transactional
-	public int approveAccomodation(Accomodation acc) {
-		System.out.println(maxAccomodation);
-		System.out.println(reservedAccomodation);
-		int flag=0;
-		int requiredBeds=acc.getNumberOfBoyChildBelow5()+acc.getNumberOfGirlChildBelow18()+1;
-		String caste=acc.getCaste();
-		int allocatedBeds=0;
-		if(acc.getEmploymentStatus().equals("Employed")) {
-			if(caste.equals("OBC")||caste.equals("EFW")||caste.equals("ST")) {
-				flag=1;
-				if(reservedAccomodation>requiredBeds)
-					allocatedBeds=requiredBeds;
-				else
-					allocatedBeds=reservedAccomodation;
-				reservedAccomodation=reservedAccomodation-allocatedBeds;
-			}
-			if(acc.getAnyPhysicalChallenges().equals("Yes")) {
-				flag=1;
-				if(reservedAccomodation>requiredBeds)
-					allocatedBeds=requiredBeds;
-				else
-					allocatedBeds=reservedAccomodation;
-				reservedAccomodation=reservedAccomodation-allocatedBeds;
-			}
-			if(acc.getUser().getUserMaritalStatus().equals("Married")) {
-				String city=acc.getUserResidenceName();
-				String hcity=acc.getHusbandResidenceName();
-				if(city.equals(hcity)==false) {
-					flag=1;
-					if(maxAccomodation>requiredBeds)
-						allocatedBeds=requiredBeds;
-					else
-						allocatedBeds=maxAccomodation;
-					maxAccomodation=maxAccomodation-allocatedBeds;
-				}
-				else
-					flag=2;
-			}
-			if(acc.getAreaOfResidence().equals("Metropolitan")) {
-				if(acc.getGrossIncomePerMonth()<50000) {
-					flag=1;
-					if(maxAccomodation>requiredBeds)
-						allocatedBeds=requiredBeds;
-					else
-						allocatedBeds=maxAccomodation;
-					maxAccomodation=maxAccomodation-allocatedBeds;
-				}
-			}
-			if(acc.getAreaOfResidence().equals("Metropolitan")==false) {
-				if(acc.getGrossIncomePerMonth()<35000) {
-					flag=1;
-					if(maxAccomodation>requiredBeds)
-						allocatedBeds=requiredBeds;
-					else
-						allocatedBeds=maxAccomodation;
-					maxAccomodation=maxAccomodation-allocatedBeds;
-				}
-			}
-			if(flag==2)
-				flag=0;
-			else
-				flag=1;
-		}
-		if(flag==1) {
-			String jpql="UPDATE Accomodation a SET a.applicationStatus=:stat WHERE a.accomodationId=:aid";
-			Query query=em.createQuery(jpql);
-			query.setParameter("aid",acc.getAccomodationId());
-			query.setParameter("stat","Approved");
-			query.executeUpdate();
-			return allocatedBeds;
-		}
-		return 0;
 	}
 
 	@Transactional
@@ -267,13 +192,6 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	public List<SukanyaYojna> viewNotApprovedSukanya() {
 		String jpql="select s from SukanyaYojna s where s.applicationStatus=:stat";
 		Query query=em.createQuery(jpql, SukanyaYojna.class);
-		query.setParameter("stat","Not Approved");
-		return query.getResultList();
-	}
-
-	public List<Accomodation> viewNotApprovedAccomodation() {
-		String jpql="select a from Accomodation a where a.applicationStatus=:stat";
-		Query query=em.createQuery(jpql, Accomodation.class);
 		query.setParameter("stat","Not Approved");
 		return query.getResultList();
 	}
@@ -481,5 +399,130 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 		String jpql="select a from Accomodation a";
 		Query query=em.createQuery(jpql, Accomodation.class);
 		return query.getResultList();
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingPhysical() {
+		String jpql="select a from Accomodation a where a.applicationStatus=:stat and a.anyPhysicalChallenges=:phy and a.employmentStatus=:emp";
+		Query query=em.createQuery(jpql, Accomodation.class);
+		query.setParameter("stat","Not Approved");
+		query.setParameter("phy","Yes");
+		query.setParameter("emp","Employed");
+		return query.getResultList();
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingST() {
+		String jpql="select a from Accomodation a where a.applicationStatus=:stat and a.caste=:cs and a.employmentStatus=:emp";
+		Query query=em.createQuery(jpql, Accomodation.class);
+		query.setParameter("stat","Not Approved");
+		query.setParameter("cs","ST");
+		query.setParameter("emp","Employed");
+		return query.getResultList();
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingSC() {
+		String jpql="select a from Accomodation a where a.applicationStatus=:stat and a.caste=:cs and a.employmentStatus=:emp";
+		Query query=em.createQuery(jpql, Accomodation.class);
+		query.setParameter("stat","Not Approved");
+		query.setParameter("cs","SC");
+		query.setParameter("emp","Employed");
+		return query.getResultList();
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingOBC() {
+		String jpql="select a from Accomodation a where a.applicationStatus=:stat and a.caste=:cs and a.employmentStatus=:emp";
+		Query query=em.createQuery(jpql, Accomodation.class);
+		query.setParameter("stat","Not Approved");
+		query.setParameter("cs","OBC");
+		query.setParameter("emp","Employed");
+		return query.getResultList();
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingEWS() {
+		String jpql="select a from Accomodation a where a.applicationStatus=:stat and a.caste=:cs and a.employmentStatus=:emp";
+		Query query=em.createQuery(jpql, Accomodation.class);
+		query.setParameter("stat","Not Approved");
+		query.setParameter("cs","EWS");
+		query.setParameter("emp","Employed");
+		return query.getResultList();
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingHusband() {
+		String jpql="select a from Accomodation a where a.applicationStatus=:stat and a.husbandResidenceName<>a.userResidenceName and a.employmentStatus=:emp";
+		Query query=em.createQuery(jpql, Accomodation.class);
+		query.setParameter("stat","Not Approved");
+		query.setParameter("emp","Employed");
+		return query.getResultList();
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingMetropolitan() {
+		String jpql="select a from Accomodation a where a.applicationStatus=:stat and a.grossIncomePerMonth<'50000' and a.areaOfResidence=:res and a.employmentStatus=:emp";
+		Query query=em.createQuery(jpql, Accomodation.class);
+		query.setParameter("stat","Not Approved");
+		query.setParameter("emp","Employed");
+		query.setParameter("res","Metropolitan");
+		return query.getResultList();
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingNonMetropolitan() {
+		String jpql="select a from Accomodation a where a.applicationStatus=:stat and a.grossIncomePerMonth<'35000' and a.areaOfResidence NOT LIKE :metro and a.employmentStatus=:emp";
+		Query query=em.createQuery(jpql);
+		query.setParameter("stat","Not Approved");
+		query.setParameter("emp","Employed");
+		query.setParameter("metro","Metropolitan");
+		return query.getResultList();
+	}
+	
+	public List<Accomodation> viewNotApprovedNotWorking() {
+		String jpql="select a from Accomodation a where a.applicationStatus=:stat and a.employmentStatus=:emp";
+		Query query=em.createQuery(jpql, Accomodation.class);
+		query.setParameter("stat","Not Approved");
+		query.setParameter("emp","Unemployed");
+		return query.getResultList();
+	}
+	
+	@Transactional
+	public int approveAccomodation(Accomodation acc) {
+		int y1=0,y2=0;
+		String city=acc.getAccomodationCity();
+		System.out.println(city);
+		int rooms=acc.getNumberOfBoyChildBelow5()+acc.getNumberOfGirlChildBelow18()+1;
+		String jpql1="select h from HomeList h where h.city=:c";
+		Query query1=em.createQuery(jpql1);
+		query1.setParameter("c",city);
+		HomeList home=(HomeList)query1.getSingleResult();
+		if(home==null) {
+			return 0;
+		}
+		int actualroom=home.getNumberOfRooms()-rooms;
+		if(actualroom<0) {
+			return 0;
+		}
+		home.setNumberOfRooms(actualroom);
+		
+		String jpql = "UPDATE Accomodation a SET a.applicationStatus = 'Approved' "	+ "WHERE a.accomodationId=:aid";
+		Query query = em.createQuery(jpql) ;
+		query.setParameter("aid",acc.getAccomodationId());
+		y1=query.executeUpdate();
+		
+		String jpql2 = "UPDATE HomeList h SET h.numberOfRooms=:nr "	+ "WHERE h.city=:cit";
+		Query query2 = em.createQuery(jpql2) ;
+		query2.setParameter("nr",home.getNumberOfRooms());
+		query2.setParameter("cit",city);
+		y2=query2.executeUpdate();
+		
+		if((y1==1)&&(y2==1))
+			return 1;
+		else
+			return 0;
+	}
+	
+	@Transactional
+	public int rejectAccomodation(Accomodation acc) {
+		int y=0;
+		String jpql = "UPDATE Accomodation a SET a.applicationStatus = 'Rejected' "	+ "WHERE a.accomodationId=:aid";
+		Query query = em.createQuery(jpql) ;
+		query.setParameter("aid",acc.getAccomodationId());
+		y=query.executeUpdate() ;
+		return y;
 	}
 }

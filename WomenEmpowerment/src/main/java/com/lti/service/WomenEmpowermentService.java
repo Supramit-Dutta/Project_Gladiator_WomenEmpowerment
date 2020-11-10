@@ -53,4 +53,15 @@ public interface WomenEmpowermentService {
 	public List<SukanyaYojna> viewSukanyas();
 	public List<SukanyaYojna> getUnApprovedSukanyas();
 	public int approveSukanya(SukanyaYojna sy);
+	public List<Accomodation> viewNotApprovedWorkingPhysical();
+	public List<Accomodation> viewNotApprovedWorkingST();
+	public List<Accomodation> viewNotApprovedWorkingSC();
+	public List<Accomodation> viewNotApprovedWorkingOBC();
+	public List<Accomodation> viewNotApprovedWorkingEWS();
+	public List<Accomodation> viewNotApprovedWorkingHusband();
+	public List<Accomodation> viewNotApprovedWorkingMetropolitan();
+	public List<Accomodation> viewNotApprovedWorkingNonMetropolitan();
+	public List<Accomodation> viewNotApprovedNotWorking();
+	public int approveAccomodation(Accomodation acc);
+	public int rejectAccomodation(Accomodation acc);
 }

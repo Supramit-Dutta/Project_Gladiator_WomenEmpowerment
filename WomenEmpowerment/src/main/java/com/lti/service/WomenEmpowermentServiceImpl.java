@@ -336,4 +336,60 @@ public class WomenEmpowermentServiceImpl implements WomenEmpowermentService {
 		int x=repo.approveSukanyaScheme(sy);
 		return x;
 	}
+	
+	public List<Accomodation> viewNotApprovedWorkingPhysical() {
+		List<Accomodation> acc=repo.viewNotApprovedWorkingPhysical();
+		return acc;
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingST() {
+		List<Accomodation> acc=repo.viewNotApprovedWorkingST();
+		return acc;
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingSC() {
+		List<Accomodation> acc=repo.viewNotApprovedWorkingSC();
+		return acc;
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingOBC() {
+		List<Accomodation> acc=repo.viewNotApprovedWorkingOBC();
+		return acc;
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingEWS() {
+		List<Accomodation> acc=repo.viewNotApprovedWorkingEWS();
+		return acc;
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingHusband() {
+		List<Accomodation> acc=repo.viewNotApprovedWorkingHusband();
+		return acc;
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingMetropolitan() {
+		List<Accomodation> acc=repo.viewNotApprovedWorkingMetropolitan();
+		return acc;
+	}
+	
+	public List<Accomodation> viewNotApprovedWorkingNonMetropolitan() {
+		List<Accomodation> acc=repo.viewNotApprovedWorkingNonMetropolitan();
+		return acc;
+	}
+	
+	public List<Accomodation> viewNotApprovedNotWorking() {
+		List<Accomodation> acc=repo.viewNotApprovedNotWorking();
+		return acc;
+	}
+	
+	public int approveAccomodation(Accomodation acc) {
+		int x=repo.approveAccomodation(acc);
+		return x;
+	}
+	
+	public int rejectAccomodation(Accomodation acc) {
+		int x=repo.rejectAccomodation(acc);
+		return x;
+	}
+	
 }
