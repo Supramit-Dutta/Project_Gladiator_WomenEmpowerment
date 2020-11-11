@@ -24,6 +24,7 @@ import com.lti.dto.NgoOperationStatusDto;
 import com.lti.dto.StatusDto;
 import com.lti.dto.StatusDto.StatusType;
 import com.lti.dto.SukanyaDto;
+import com.lti.dto.UserDto;
 import com.lti.entity.Accomodation;
 import com.lti.entity.Course;
 import com.lti.entity.Enroll;
@@ -201,7 +202,17 @@ public class EmpowermentController {
 	}
 	
 	@PostMapping(path = "/registerUser")
-	public StatusDto registerUser(@RequestBody User user) {
+	public StatusDto registerUser(@RequestBody UserDto userdto) {
+		User user=new User();
+		LocalDate localdate=LocalDate.parse(userdto.getUserDateOfBirth());
+		user.setUserDateOfBirth(localdate);
+		user.setUserAddress(userdto.getUserAddress());
+		user.setUserEmail(userdto.getUserEmail());
+		user.setUserGender(userdto.getUserGender());
+		user.setUserMaritalStatus(userdto.getUserMaritalStatus());
+		user.setUserName(userdto.getUserName());
+		user.setUserNationality(userdto.getUserNationality());
+		user.setUserPassword(userdto.getUserPassword());
 	    try {
 	            services.userRegister(user);
 	            
@@ -312,11 +323,13 @@ public class EmpowermentController {
 	@RequestMapping("/addCourse")
 	public NgoOperationStatusDto addCourse(@RequestBody CourseOperationDto coursedto){
 		Course c=new Course();
+		LocalDate localdatestart=LocalDate.parse(coursedto.getCourseStartDate());
+		LocalDate localdateend=LocalDate.parse(coursedto.getCourseEndDate());
 		NGO ngo=services.findanNGOByEmail(coursedto.getNgoEmail());
 		c.setCourseName(coursedto.getCourseName());
 		c.setCourseBenefits(coursedto.getCourseBenefits());
-		c.setCourseEndDate(coursedto.getCourseEndDate());
-		c.setCourseStartDate(coursedto.getCourseStartDate());
+		c.setCourseEndDate(localdateend);
+		c.setCourseStartDate(localdatestart);
 		c.setTrainingSector(coursedto.getTrainingSector());
 		c.setCourseProvidingNGO(ngo.getNgoName());
 		c.setNgo(ngo);
@@ -340,10 +353,12 @@ public class EmpowermentController {
 	public NgoOperationStatusDto editCourse(@RequestBody CourseOperationDto coursedto){
 		Course c=services.findCourseByCourseId(coursedto.getCourseId());
 		NGO ngo=services.findanNGOByEmail(coursedto.getNgoEmail());
+		LocalDate localdatestart=LocalDate.parse(coursedto.getCourseStartDate());
+		LocalDate localdateend=LocalDate.parse(coursedto.getCourseEndDate());
 		c.setCourseName(coursedto.getCourseName());
 		c.setCourseBenefits(coursedto.getCourseBenefits());
-		c.setCourseEndDate(coursedto.getCourseEndDate());
-		c.setCourseStartDate(coursedto.getCourseStartDate());
+		c.setCourseEndDate(localdateend);
+		c.setCourseStartDate(localdatestart);
 		c.setTrainingSector(coursedto.getTrainingSector());
 		c.setCourseProvidingNGO(ngo.getNgoName());
 		c.setNgo(ngo);
@@ -446,14 +461,7 @@ public class EmpowermentController {
 			status.setStatus(StatusType.FAILURE);
 			return status;
 		}
-		if(ngo.getNgoId()==user.getNgo().getNgoId()) {
-			EnrollmentStatusDto status=new EnrollmentStatusDto();
-			status.setMessage("You are registered with "+ngo.getNgoId());
-			status.setStatus(StatusType.SUCCESS);
-			status.setNgoName(ngo.getNgoName());
-			return status;
-		}
-		if(ngo!=null) {
+		if(user.getNgo()==null) {
 			try {
 				services.RegisterWithNgo(user, ngo);
 				EnrollmentStatusDto status=new EnrollmentStatusDto();
@@ -468,6 +476,13 @@ public class EmpowermentController {
 				status.setStatus(StatusType.FAILURE);
 				return status;
 			}
+		}
+		if(ngo.getNgoId()==user.getNgo().getNgoId()) {
+			EnrollmentStatusDto status=new EnrollmentStatusDto();
+			status.setMessage("You are registered with "+ngo.getNgoId());
+			status.setStatus(StatusType.SUCCESS);
+			status.setNgoName(ngo.getNgoName());
+			return status;
 		}
 		EnrollmentStatusDto status=new EnrollmentStatusDto();
 		status.setMessage("Incorrect NGO Id. Choose one from the table");
@@ -500,7 +515,7 @@ public class EmpowermentController {
 		}
 		catch(WomenEmpowermentException e) {
 			EnrollmentStatusDto status=new EnrollmentStatusDto();
-			status.setMessage("Enrollment Application unsuccessful!");
+			status.setMessage("You are already Enrolled For this Course !!! ");
 			status.setStatus(StatusType.FAILURE);
             return status;
 		}
@@ -751,9 +766,11 @@ public class EmpowermentController {
 				int y=services.approveAccomodation(single);
 				if(y==1) {
 					accepted++;
+					int rooms=single.getNumberOfGirlChildBelow18()+single.getNumberOfBoyChildBelow5()+1;
+					String city=single.getAccomodationCity();
 					System.out.println("Physical accepted!");
 					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
-							". Your address will be mailed soon.";
+							". Your address will be mailed soon.You have been given "+rooms+" rooms in "+city;
 		            String subject="Accomodation Confirmation";
 		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
 				}	
@@ -772,9 +789,11 @@ public class EmpowermentController {
 				int y=services.approveAccomodation(single);
 				if(y==1) {
 					accepted++;
+					int rooms=single.getNumberOfGirlChildBelow18()+single.getNumberOfBoyChildBelow5()+1;
+					String city=single.getAccomodationCity();
 					System.out.println("ST accepted!");
 					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
-							". Your address will be mailed soon.";
+							". Your address will be mailed soon. You have been given "+rooms+" rooms in "+city;
 		            String subject="Accomodation Confirmation";
 		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
 				}	
@@ -793,8 +812,10 @@ public class EmpowermentController {
 				int y=services.approveAccomodation(single);
 				if(y==1) {
 					accepted++;
+					int rooms=single.getNumberOfGirlChildBelow18()+single.getNumberOfBoyChildBelow5()+1;
+					String city=single.getAccomodationCity();
 					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
-							". Your address will be mailed soon.";
+							". Your address will be mailed soon.You have been given "+rooms+" rooms in "+city;
 		            String subject="Accomodation Confirmation";
 		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
 				}	
@@ -813,8 +834,10 @@ public class EmpowermentController {
 				int y=services.approveAccomodation(single);
 				if(y==1) {
 					accepted++;
+					int rooms=single.getNumberOfGirlChildBelow18()+single.getNumberOfBoyChildBelow5()+1;
+					String city=single.getAccomodationCity();
 					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
-							". Your address will be mailed soon.";
+							". Your address will be mailed soon.You have been given "+rooms+" rooms in "+city;
 		            String subject="Accomodation Confirmation";
 		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
 				}	
@@ -833,8 +856,10 @@ public class EmpowermentController {
 				int y=services.approveAccomodation(single);
 				if(y==1) {
 					accepted++;
+					int rooms=single.getNumberOfGirlChildBelow18()+single.getNumberOfBoyChildBelow5()+1;
+					String city=single.getAccomodationCity();
 					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
-							". Your address will be mailed soon.";
+							". Your address will be mailed soon.You have been given "+rooms+" rooms in "+city;
 		            String subject="Accomodation Confirmation";
 		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
 				}	
@@ -853,8 +878,10 @@ public class EmpowermentController {
 				int y=services.approveAccomodation(single);
 				if(y==1) {
 					accepted++;
+					int rooms=single.getNumberOfGirlChildBelow18()+single.getNumberOfBoyChildBelow5()+1;
+					String city=single.getAccomodationCity();
 					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
-							". Your address will be mailed soon.";
+							". Your address will be mailed soon.You have been given "+rooms+" rooms in "+city;
 		            String subject="Accomodation Confirmation";
 		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
 				}	
@@ -873,8 +900,10 @@ public class EmpowermentController {
 				int y=services.approveAccomodation(single);
 				if(y==1) {
 					accepted++;
+					int rooms=single.getNumberOfGirlChildBelow18()+single.getNumberOfBoyChildBelow5()+1;
+					String city=single.getAccomodationCity();
 					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
-							". Your address will be mailed soon.";
+							". Your address will be mailed soon.You have been given "+rooms+" rooms in "+city;
 		            String subject="Accomodation Confirmation";
 		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
 				}	
@@ -896,8 +925,10 @@ public class EmpowermentController {
 				int y=services.approveAccomodation(single);
 				if(y==1) {
 					accepted++;
+					int rooms=single.getNumberOfGirlChildBelow18()+single.getNumberOfBoyChildBelow5()+1;
+					String city=single.getAccomodationCity();
 					String text="Your application for Accomodation is approved. Your accomodation id is: "+single.getAccomodationId()+
-							". Your address will be mailed soon.";
+							". Your address will be mailed soon.You have been given "+rooms+" rooms in "+city;
 		            String subject="Accomodation Confirmation";
 		            emailService.sendEmailForNewRegistration(single.getUser().getUserEmail(), text, subject);
 				}	
@@ -938,5 +969,15 @@ public class EmpowermentController {
 	public NGO viewNGOStatus(@RequestBody NGOStatusDto ngodto) {
 		NGO ngo=services.findanNGOByEmail(ngodto.getNgoemail());
 		return ngo;
+	}
+	@RequestMapping("/findAUser")
+	public User findAUser(@RequestBody UserDto userdto) {
+		int uid=userdto.getUserId();
+		return services.findUserById(uid);
+	}
+	@RequestMapping("/findANGO")
+	public NGO findANGO(@RequestBody NGOStatusDto ngodto) {
+		int nid=ngodto.getNgoId();
+		return services.findNGOById(nid);
 	}
 }

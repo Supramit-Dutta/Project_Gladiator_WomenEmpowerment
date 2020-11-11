@@ -6,8 +6,8 @@ public class CourseOperationDto {
 
 	int courseId;
 	String courseName;
-	LocalDate courseStartDate;
-	LocalDate courseEndDate;
+	String courseStartDate;
+	String courseEndDate;
 	String courseProvidingNGO;
 	String courseBenefits;
 	String trainingSector;
@@ -24,16 +24,16 @@ public class CourseOperationDto {
 	public void setCourseName(String courseName) {
 		this.courseName = courseName;
 	}
-	public LocalDate getCourseStartDate() {
+	public String getCourseStartDate() {
 		return courseStartDate;
 	}
-	public void setCourseStartDate(LocalDate courseStartDate) {
+	public void setCourseStartDate(String courseStartDate) {
 		this.courseStartDate = courseStartDate;
 	}
-	public LocalDate getCourseEndDate() {
+	public String getCourseEndDate() {
 		return courseEndDate;
 	}
-	public void setCourseEndDate(LocalDate courseEndDate) {
+	public void setCourseEndDate(String courseEndDate) {
 		this.courseEndDate = courseEndDate;
 	}
 	public String getCourseProvidingNGO() {
