@@ -481,7 +481,7 @@ public class EmpowermentRepositoryImpl implements EmpowermentRepository {
 	
 	@Transactional
 	public int approveAccomodation(Accomodation acc) {
-		if(acc.getUser().getUserGender().equals("Female")) {
+		if(acc.getUser().getUserGender().equalsIgnoreCase("Female")) {
 			int y1=0,y2=0;
 			String city=acc.getAccomodationCity();
 			System.out.println(city);

@@ -105,7 +105,7 @@ public class EmpowermentController {
 	
 	@PostMapping("/forgotNgo")
 	public StatusDto ngoForgot(@RequestBody LoginDto loginDto) {
-		services.forgotUserPassword(loginDto.getEmail());
+		services.forgotNGOPassword(loginDto.getEmail());
 		StatusDto otpstatus=new StatusDto();
 		otpstatus.setMessage("OTP Sent");
 		otpstatus.setStatus(StatusType.SUCCESS);
